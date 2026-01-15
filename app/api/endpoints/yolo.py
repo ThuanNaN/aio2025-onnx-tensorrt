@@ -26,9 +26,9 @@ class ModelLoader:
             model_paths: Dictionary mapping model format names to file paths
         """
         self.model_paths = model_paths or {
-            "pytorch": "models/yolo26n.pt",
-            "onnx": "models/yolo26n.onnx",
-            "tensorrt": "models/yolo26n.engine"
+            "pytorch": "models/yolo26l.pt",
+            "onnx": "models/yolo26l.onnx",
+            "tensorrt": "models/yolo26l.engine"
         }
         self._models: Dict[str, Any] = {
             "pytorch": None,
@@ -209,7 +209,7 @@ async def predict(
     img_size: int = Form(640)
 ):
     """
-    Perform object detection on an uploaded image using yolo26n
+    Perform object detection on an uploaded image using yolo26l
     
     Args:
         file: Image file to process

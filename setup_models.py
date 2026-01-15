@@ -16,9 +16,9 @@ def download_and_convert_yolo26():
     print("=" * 60)
     
     # Model paths
-    pytorch_path = MODELS_DIR / "yolo26n.pt"
-    onnx_path = MODELS_DIR / "yolo26n.onnx"
-    tensorrt_path = MODELS_DIR / "yolo26n.engine"
+    pytorch_path = MODELS_DIR / "yolo26l.pt"
+    onnx_path = MODELS_DIR / "yolo26l.onnx"
+    tensorrt_path = MODELS_DIR / "yolo26l.engine"
     
     # Step 1: Download PyTorch model
     print("\n[1/3] Downloading YOLO26 PyTorch model...")
@@ -55,7 +55,7 @@ def download_and_convert_yolo26():
     print("Setup Complete!")
     print("=" * 60)
     print("\nAvailable models:")
-    for model_file in MODELS_DIR.glob("yolo26n.*"):
+    for model_file in MODELS_DIR.glob("yolo26l.*"):
         size_mb = model_file.stat().st_size / (1024 * 1024)
         print(f"  - {model_file.name} ({size_mb:.2f} MB)")
 
