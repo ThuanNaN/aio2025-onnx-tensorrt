@@ -556,7 +556,7 @@ class APIBenchmark:
                     ha='center', va='center', transform=ax6.transAxes)
             ax6.set_title('Speedup vs PyTorch Baseline', fontsize=12, fontweight='bold')
         
-        plt.suptitle('YOLO Model Format Performance Benchmark', 
+        plt.suptitle('YOLO26n Model Format Performance Benchmark', 
                     fontsize=14, fontweight='bold', y=0.995)
         plt.tight_layout()
         
