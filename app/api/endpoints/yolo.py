@@ -92,19 +92,33 @@ class ModelLoader:
         return self._models["pytorch"]
     
     def _load_onnx_model(self, model_path: str):
-        """Load ONNX model"""
+        """Load ONNX model with GPU acceleration"""
         if self._models["onnx"] is None:
             # Configure session options for better performance
             session_options = ort.SessionOptions()
             session_options.log_severity_level = 3  # 0:Verbose, 1:Info, 2:Warning, 3:Error, 4:Fatal
             session_options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
             
+            # Try GPU first, fallback to CPU if needed
             providers = ['CUDAExecutionProvider', 'CPUExecutionProvider']
-            self._models["onnx"] = ort.InferenceSession(
-                model_path, 
-                sess_options=session_options,
-                providers=providers
-            )
+            
+            try:
+                session = ort.InferenceSession(
+                    model_path, 
+                    sess_options=session_options,
+                    providers=providers
+                )
+                # Check which provider is actually being used
+                active_provider = session.get_providers()[0]
+                print(f"ONNX Runtime using: {active_provider}")
+                self._models["onnx"] = session
+            except Exception as e:
+                print(f"Error loading ONNX model with GPU, trying CPU only: {e}")
+                self._models["onnx"] = ort.InferenceSession(
+                    model_path, 
+                    sess_options=session_options,
+                    providers=['CPUExecutionProvider']
+                )
         return self._models["onnx"]
     
     def _load_tensorrt_model(self, model_path: str):
@@ -168,6 +182,54 @@ def preprocess_image(image: Image.Image, img_size: int = 640):
     return image, original_size
 
 
+def postprocess_onnx_outputs(outputs, conf_threshold: float = 0.25, img_size: int = 640):
+    """
+    Post-process ONNX YOLO outputs
+    
+    YOLO ONNX output format (post-NMS): [batch, 300, 6]
+    where 6 = [x1, y1, x2, y2, confidence, class_id]
+    """
+    predictions = outputs[0]  # Shape: [batch, 300, 6]
+    detections = []
+    
+    # Get COCO class names (80 classes)
+    class_names = [
+        'person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat', 'traffic light',
+        'fire hydrant', 'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog', 'horse', 'sheep', 'cow',
+        'elephant', 'bear', 'zebra', 'giraffe', 'backpack', 'umbrella', 'handbag', 'tie', 'suitcase', 'frisbee',
+        'skis', 'snowboard', 'sports ball', 'kite', 'baseball bat', 'baseball glove', 'skateboard', 'surfboard',
+        'tennis racket', 'bottle', 'wine glass', 'cup', 'fork', 'knife', 'spoon', 'bowl', 'banana', 'apple',
+        'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog', 'pizza', 'donut', 'cake', 'chair', 'couch',
+        'potted plant', 'bed', 'dining table', 'toilet', 'tv', 'laptop', 'mouse', 'remote', 'keyboard',
+        'cell phone', 'microwave', 'oven', 'toaster', 'sink', 'refrigerator', 'book', 'clock', 'vase',
+        'scissors', 'teddy bear', 'hair drier', 'toothbrush'
+    ]
+    
+    # Process each detection in batch
+    for batch_idx in range(predictions.shape[0]):
+        for detection in predictions[batch_idx]:
+            x1, y1, x2, y2, confidence, class_id = detection
+            
+            # Filter by confidence threshold
+            if confidence >= conf_threshold:
+                class_id = int(class_id)
+                
+                detection_dict = {
+                    "class_id": class_id,
+                    "class_name": class_names[class_id] if class_id < len(class_names) else f"class_{class_id}",
+                    "confidence": float(confidence),
+                    "bbox": {
+                        "x1": float(x1),
+                        "y1": float(y1),
+                        "x2": float(x2),
+                        "y2": float(y2)
+                    }
+                }
+                detections.append(detection_dict)
+    
+    return detections
+
+
 def postprocess_results(results, format_type: str, conf_threshold: float = 0.25):
     """Convert inference results to standardized format"""
     detections = []
@@ -193,9 +255,8 @@ def postprocess_results(results, format_type: str, conf_threshold: float = 0.25)
                     detections.append(detection)
     
     elif format_type == "onnx":
-        # ONNX format - needs custom post-processing
-        # This is a placeholder - actual implementation depends on ONNX output format
-        pass
+        # ONNX format uses custom post-processing
+        detections = postprocess_onnx_outputs(results, conf_threshold)
     
     return detections
 

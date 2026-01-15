@@ -27,7 +27,16 @@ def convert_to_tensorrt():
     print("Note: TensorRT conversion requires NVIDIA GPU and TensorRT installed")
     try:
         model = YOLO(str(pytorch_path))
-        model.export(format="engine", device=0, half=False)
+        model.export(
+            format="engine", 
+            device=0,
+            half=False,
+            dynamic=False, 
+            simplify=True, 
+            batch=1, 
+            imgsz=640,
+            nms=False
+        )
         print(f"✓ TensorRT model saved to: {tensorrt_path}")
         size_mb = tensorrt_path.stat().st_size / (1024 * 1024)
         print(f"  Size: {size_mb:.2f} MB")

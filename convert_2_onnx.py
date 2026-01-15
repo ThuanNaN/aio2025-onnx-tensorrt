@@ -26,10 +26,21 @@ def convert_to_onnx():
     print("\nConverting to ONNX format...")
     try:
         model = YOLO(str(pytorch_path))
-        model.export(format="onnx", dynamic=True, simplify=True)
+        # Export with static shapes for better GPU performance
+        model.export(
+            format="onnx", 
+            device=0,
+            half=False,
+            dynamic=False, 
+            simplify=True, 
+            batch=1, 
+            imgsz=640,
+            nms=False
+        )
         print(f"✓ ONNX model saved to: {onnx_path}")
         size_mb = onnx_path.stat().st_size / (1024 * 1024)
         print(f"  Size: {size_mb:.2f} MB")
+        print(f"  Exported with static batch size=1, imgsz=640 for optimal GPU performance")
     except Exception as e:
         print(f"✗ Failed to export to ONNX: {e}")
         return False
