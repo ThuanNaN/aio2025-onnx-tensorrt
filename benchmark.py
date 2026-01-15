@@ -411,7 +411,6 @@ class APIBenchmark:
         
         with open(output_file, 'w') as f:
             json.dump({
-                "timestamp": timestamp,
                 "results": json_results
             }, f, indent=2)
         
@@ -602,7 +601,7 @@ def main():
     parser.add_argument(
         "--iterations",
         type=int,
-        default=10,
+        default=1,
         help="Number of benchmark iterations (default: 10)"
     )
     parser.add_argument(
