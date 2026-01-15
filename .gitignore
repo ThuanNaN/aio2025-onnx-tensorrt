@@ -207,6 +207,9 @@ marimo/_lsp/
 __marimo__/
 
 *.deb
+*.zip
+images/
+benchmark_results/
 
 # Model files (too large for git)
 models/
