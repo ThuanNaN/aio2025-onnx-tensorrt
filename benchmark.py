@@ -471,7 +471,7 @@ class APIBenchmark:
         # 3. Inference Time Distribution (Box Plot)
         ax3 = plt.subplot(2, 3, 3)
         data_to_plot = [np.array(valid_results[m]["inference_time"]["all"]) * 1000 for m in models]
-        bp = ax3.boxplot(data_to_plot, labels=models, patch_artist=True)
+        bp = ax3.boxplot(data_to_plot, tick_labels=models, patch_artist=True)
         
         # Color the box plots
         for patch, model in zip(bp['boxes'], models):
