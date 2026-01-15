@@ -10,7 +10,6 @@ import json
 import numpy as np
 import matplotlib.pyplot as plt
 from typing import Dict, List
-from datetime import datetime
 import argparse
 
 
@@ -390,8 +389,7 @@ class APIBenchmark:
         """Save benchmark results to JSON file"""
         os.makedirs(output_dir, exist_ok=True)
         
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        output_file = os.path.join(output_dir, f"benchmark_{timestamp}.json")
+        output_file = os.path.join(output_dir, f"benchmark.json")
         
         # Prepare results for JSON serialization
         json_results = {}
@@ -561,15 +559,9 @@ class APIBenchmark:
         plt.tight_layout()
         
         # Save plot
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        output_file = os.path.join(output_dir, f"benchmark_plot_{timestamp}.png")
+        output_file = os.path.join(output_dir, "benchmark_plot.png")
         plt.savefig(output_file, dpi=300, bbox_inches='tight')
         print(f"✓ Plot saved to: {output_file}")
-        
-        # Also save as PDF for high quality
-        output_file_pdf = os.path.join(output_dir, f"benchmark_plot_{timestamp}.pdf")
-        plt.savefig(output_file_pdf, bbox_inches='tight')
-        print(f"✓ Plot saved to: {output_file_pdf}")
         
         plt.show()
         
