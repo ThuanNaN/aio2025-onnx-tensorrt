@@ -40,13 +40,14 @@ conda activate onnx_tensorrt
 ### Dependencies
 
 ```bash
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 ```
 
 ### Download and Prepare Models
 
 ```bash
-python setup_models.py
+python download_yolo.py
+python convert_2_tensorrt.py # Converts both ONNX and TensorRT
 ```
 
 This will:
