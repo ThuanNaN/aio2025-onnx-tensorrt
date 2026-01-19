@@ -19,13 +19,6 @@ This project provides a FastAPI-based REST API for serving YOLO26 object detecti
 - NVIDIA Driver 580.95.05
 - CUDA 13.0
 
-### TensorRT
-
-Setup TensorRT by running:
-
-```bash
-bash setup_tensorrt.sh
-```
 
 ### Environment
 
