@@ -216,6 +216,7 @@ notebooks/runs/
 models/
 *.pt
 *.onnx
+*.onnx.*
 *.engine
 *.weights
 *.pth
